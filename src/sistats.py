@@ -42,13 +42,17 @@ def get_fs_stats(ignore_fsname=IGNORE_FSNAME, ignore_fstype=IGNORE_FSTYPE):
         fs_current['type'] = fs_stat.fstype
         fs_current['mnt_point'] = fs_stat.mountpoint
 
-        # this may raise an exception, check which one and why and
-        # handle it, preferably without a try except continue
-        fs_usage = psutil.disk_usage(fs_stat.mountpoint)
+        try:
+            fs_usage = psutil.disk_usage(fs_stat.mountpoint)
 
-        fs_current['size']  = fs_usage.total
-        fs_current['used']  = fs_usage.used
-        fs_current['avail'] = fs_usage.free
+            fs_current['size']  = fs_usage.total
+            fs_current['used']  = fs_usage.used
+            fs_current['avail'] = fs_usage.free
+
+        except OSError:
+            fs_current['size']  = -1
+            fs_current['used']  = -1
+            fs_current['avail'] = -1
 
         filesystems[fs_stat.device] = fs_current
 
@@ -85,12 +89,16 @@ def get_platform_info():
 
 def _calculate_cpu_stats(cputime):
     '''return stats for a cpu'''
-    return {
+    base = {
         'kernel': cputime.system,
         'user': cputime.user,
-        'idle': cputime.idle,
-        'nice': cputime.nice
+        'idle': cputime.idle
     }
+
+    if hasattr(cputime, 'nice'):
+        base['nice'] = cputime.nice
+
+    return base
 
 def _calculate_delta(old, new, *names):
     '''calculate the delta between old and new field *names*'''
@@ -157,7 +165,11 @@ def get_mem_stats_delta(old, new):
 
 def get_mem_stats():
     '''return mem stats'''
-    cachemem = psutil.cached_phymem() + psutil.phymem_buffers()
+
+    if hasattr(psutil, 'cached_phymem') and hasattr(psutil, 'phymem_buffers'):
+        cachemem = psutil.cached_phymem() + psutil.phymem_buffers()
+    else:
+        cachemem = -1
 
     phymem = psutil.phymem_usage()
     mem = {

@@ -51,6 +51,14 @@ and implementing the missing methods.
 .. _`BSON`: http://bsonspec.org/
 .. _`glances`: https://github.com/nicolargo/glances/
 
+how to run on windows?
+----------------------
+
+* install python 2.7 from python.org
+* install psutil from http://www.lfd.uci.edu/~gohlke/pythonlibs/#psutil
+* download requests zip and run: python setup.py install 
+* download sistats https://github.com/marianoguerra/sistats/zipball/master
+
 license?
 --------
 
