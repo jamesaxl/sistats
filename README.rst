@@ -6,17 +6,17 @@ sistats
 why?
 ----
 
-I need to *collect system stats and send them somewhere else*:sup:`TM`
+I need to *collect system stats and put it over there*:sup:`TM`
 
 I wanted to start extracting the stats collection from `glances`_ but the code
-was riden with try/except and kind of unpythonic *so I decided to start from scratch*:sup:`TM`
+was full of try/except and kind of unpythonic *so I decided to start from scratch*:sup:`TM`
 
 what?
 -----
 
 a library (sistats) that gives you system stats and allows to calculate the
 variation between two reads and some modules that allow to periodically check
-for stats and send them somewhere else
+for stats and put it over there (mqtt and REST for now)
 
 an example of the sistats module:
 
