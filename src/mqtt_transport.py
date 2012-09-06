@@ -4,6 +4,8 @@ import mosquitto
 
 import transport
 
+from optparse import OptionParser
+
 class Checker(transport.Checker):
     '''checker class that sends the stats to a mqtt broker'''
 
@@ -39,14 +41,41 @@ class Checker(transport.Checker):
         '''cleanup resources'''
         self.client.disconnect()
 
+def base_option_parser():
+    '''create a parser for the basic options and return it, used to extend
+    the command line parsing with custom options for other agents
+    '''
+    parser = OptionParser()
+
+    parser.add_option("-v", action="store_true", dest="verbose", default=False,
+        help="be verbose")
+    parser.add_option("-c", "--clientid", dest="clientid", default=None,
+        help="generate event for clientid", metavar="ID")
+
+    parser.add_option("-H", "--host", dest="host", default="localhost",
+        help="send events to HOST", metavar="HOST")
+    parser.add_option("-P", "--port", dest="port", default=1883,
+        type="int", help="send events to PORT", metavar="PORT")
+
+    parser.add_option("-u", "--username", dest="username", default=None,
+        help="authenticate using USERNAME", metavar="USERNAME")
+    parser.add_option("-p", "--password", dest="password", default=None,
+        help="authenticate using PASSWORD, if not provided ask for it",
+        metavar="PASSWORD")
+
+    parser.add_option("-C", "--checkinterval", dest="checkinterval",
+            default=10, type="int",
+            help="check for new values every SEC seconds", metavar="SEC")
+
+    return parser
 def main():
     '''main function if this module is called, starts a mqtt listener'''
-    import sys
+    parser = base_option_parser()
+    opts, _args = parser.parse_args()
 
-    client_id = sys.argv[1]
-    checker = Checker(client_id)
-    print "run 'python mqtt_listener.py", client_id, "' to see the output"
-    transport.main_loop(checker)
+    checker = Checker(opts.clientid, opts.host, opts.port)
+    print "run 'python mqtt_listener.py", opts.clientid, "' to see the output"
+    transport.main_loop(checker, opts.checkinterval)
 
 if __name__ == "__main__":
     main()
