@@ -11,6 +11,62 @@ I need to *collect system stats and send them somewhere else*:sup:`TM`
 I wanted to start extracting the stats collection from `glances`_ but the code
 was riden with try/except and kind of unpythonic *so I decided to start from scratch*:sup:`TM`
 
+what?
+-----
+
+a library (sistats) that gives you system stats and allows to calculate the
+variation between two reads and some modules that allow to periodically check
+for stats and send them somewhere else
+
+an example of the sistats module:
+
+.. code-block:: python
+
+    import time
+    from sistats import *
+
+    cpu  = get_cpu_stats()
+    mem  = get_mem_stats()
+    net  = get_net_stats()
+    disk = get_disk_stats()
+    fst  = get_fs_stats()
+
+    platinfo = get_platform_info()
+
+    pretty_print("Platform", platinfo)
+    pretty_print("CPU", cpu)
+    pretty_print("Memory", mem)
+    pretty_print("Net", net)
+    pretty_print("Disk", disk)
+    pretty_print("File System", fst)
+
+    while True:
+        time.sleep(5)
+
+        new_cpu  = get_cpu_stats()
+        new_mem  = get_mem_stats()
+        new_net  = get_net_stats()
+        new_disk = get_disk_stats()
+        new_fst  = get_fs_stats()
+
+        cpu_diff  = get_cpu_stats_delta(cpu, new_cpu)
+        mem_diff  = get_mem_stats_delta(mem, new_mem)
+        net_diff  = get_net_stats_delta(net, new_net)
+        disk_diff = get_disk_stats_delta(disk, new_disk)
+        fst_diff  = get_fs_stats_delta(fst, new_fst)
+
+        pretty_print("CPU diff", cpu_diff)
+        pretty_print("Memory diff", mem_diff)
+        pretty_print("Net diff", net_diff)
+        pretty_print("Disk diff", disk_diff)
+        pretty_print("File System diff", fst_diff)
+
+        cpu  = new_cpu
+        mem  = new_mem
+        net  = new_net
+        disk = new_disk
+        fst  = new_fst
+
 who?
 ----
 
