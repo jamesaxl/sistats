@@ -119,8 +119,8 @@ def get_cpu_stats_delta(old, new):
     delta = {}
 
     delta["global"] = get_cpu_delta(old["global"], new["global"])
-    delta["percpu"] = [get_cpu_delta(oldcpu, newcpu) for oldcpu, newcpu in
-            zip(old["percpu"], new["percpu"])]
+    delta["cpu"] = [get_cpu_delta(oldcpu, newcpu) for oldcpu, newcpu in
+            zip(old["cpu"], new["cpu"])]
 
     return delta
 
@@ -135,7 +135,7 @@ def get_cpu_stats():
 
     return {
         "global": cpu,
-        "percpu": percpu
+        "cpu": percpu
     }
 
 def get_load_stats():
