@@ -1,7 +1,7 @@
 sistats
 =======
 
-.. image:: sistats.jpg
+.. image:: https://raw.github.com/marianoguerra/sistats/master/sistats.jpg
 
 why?
 ----
