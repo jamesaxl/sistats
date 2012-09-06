@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Sistats by marianoguerra</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Sistats</h1>
+        <p>collect system stats and send them somewhere else(TM)</p>
+
+        <p class="view"><a href="https://github.com/marianoguerra/sistats">View the Project on GitHub <small>marianoguerra/sistats</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/marianoguerra/sistats/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/marianoguerra/sistats/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/marianoguerra/sistats">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>sistats</h1>
+
+<p><img src="https://raw.github.com/marianoguerra/sistats/master/sistats.jpg" alt="this is no xkcd"></p>
+
+<h2>why?</h2>
+
+<p>I need to <em>collect system stats and send them somewhere else</em>(TM)</p>
+
+<p>I wanted to start extracting the stats collection from <a href="https://github.com/nicolargo/glances/">glances</a> but the code
+was riden with try/except and kind of unpythonic <em>so I decided to start from scratch</em>(TM)</p>
+
+<h2>who?</h2>
+
+<p>marianoguerra</p>
+
+<h2>how?</h2>
+
+<p>to use it you have to decide where are you sending it, you can send it to
+the console using the dummy sample ConsoleChecker (in transport.py), to try it:</p>
+
+<pre><code>python transport.py
+</code></pre>
+
+<p>you can send it to <a href="http://mosquitto.org/">mosquitto</a>:    </p>
+
+<pre><code># python mqtt_transport.py -c &lt;client id here&gt;
+# check python mqtt_transport.py -h for options
+python mqtt_transport.py -c ganesha
+</code></pre>
+
+<p>you can listen to those events using mqtt_listener:</p>
+
+<pre><code># python mqtt_listener.py &lt;client id here&gt;
+# for example
+python mqtt_listener.py ganesha 
+</code></pre>
+
+<p>to use <a href="http://mosquitto.org/">mosquitto</a> you should have it running on your system, it sends
+the payload as <a href="http://bsonspec.org/">BSON</a></p>
+
+<p>you can send it to a REST API:</p>
+
+<pre><code># check python rest_transport.py -h for options
+python rest_transport.py -c ganesha -u god -p secret -v
+</code></pre>
+
+<p>you can implement any other transport just subclassing transport.Checker
+and implementing the missing methods.</p>
+
+<h2>license?</h2>
+
+<p>LGPL v3 + optional beer for the author</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/marianoguerra">marianoguerra</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
