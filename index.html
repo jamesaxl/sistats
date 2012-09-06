@@ -30,14 +30,68 @@
       <section>
         <h1>sistats</h1>
 
-<p><img src="https://raw.github.com/marianoguerra/sistats/master/sistats.jpg" alt="this is no xkcd"></p>
+<p><img src="https://raw.github.com/marianoguerra/sistats/master/sistats.jpg" alt="this is not xkcd"></p>
 
 <h2>why?</h2>
 
-<p>I need to <em>collect system stats and send them somewhere else</em>(TM)</p>
+<p>I need to <em>collect system stats and put it over there</em>(TM)</p>
 
 <p>I wanted to start extracting the stats collection from <a href="https://github.com/nicolargo/glances/">glances</a> but the code
-was riden with try/except and kind of unpythonic <em>so I decided to start from scratch</em>(TM)</p>
+was full of try/except and kind of unpythonic <em>so I decided to start from scratch</em>(TM)</p>
+
+<h2>what?</h2>
+
+<p>a library (sistats) that gives you system stats and allows to calculate the
+variation between two reads and some modules that allow to periodically check
+for stats and put it over there (mqtt and REST for now)</p>
+
+<p>an example of the sistats module:</p>
+
+<pre><code>import time
+from sistats import *
+
+cpu  = get_cpu_stats()
+mem  = get_mem_stats()
+net  = get_net_stats()``
+disk = get_disk_stats()
+fst  = get_fs_stats()
+
+platinfo = get_platform_info()
+
+pretty_print("Platform", platinfo)
+pretty_print("CPU", cpu)
+pretty_print("Memory", mem)
+pretty_print("Net", net)
+pretty_print("Disk", disk)
+pretty_print("File System", fst)
+
+while True:
+    time.sleep(5)
+
+    new_cpu  = get_cpu_stats()
+    new_mem  = get_mem_stats()
+    new_net  = get_net_stats()
+    new_disk = get_disk_stats()
+    new_fst  = get_fs_stats()
+
+    cpu_diff  = get_cpu_stats_delta(cpu, new_cpu)
+    mem_diff  = get_mem_stats_delta(mem, new_mem)
+    net_diff  = get_net_stats_delta(net, new_net)
+    disk_diff = get_disk_stats_delta(disk, new_disk)
+    fst_diff  = get_fs_stats_delta(fst, new_fst)
+
+    pretty_print("CPU diff", cpu_diff)
+    pretty_print("Memory diff", mem_diff)
+    pretty_print("Net diff", net_diff)
+    pretty_print("Disk diff", disk_diff)
+    pretty_print("File System diff", fst_diff)
+
+    cpu  = new_cpu
+    mem  = new_mem
+    net  = new_net
+    disk = new_disk
+    fst  = new_fst
+</code></pre>
 
 <h2>who?</h2>
 
@@ -77,7 +131,16 @@ python rest_transport.py -c ganesha -u god -p secret -v
 <p>you can implement any other transport just subclassing transport.Checker
 and implementing the missing methods.</p>
 
-<h2>license?</h2>
+<h2>how to run on windows?</h2>
+
+<ul>
+<li>install python 2.7 from python.org</li>
+<li>install psutil from <a href="http://www.lfd.uci.edu/%7Egohlke/pythonlibs/#psutil">http://www.lfd.uci.edu/~gohlke/pythonlibs/#psutil</a>
+</li>
+<li>download requests zip and run: python setup.py install </li>
+<li>download sistats <a href="https://github.com/marianoguerra/sistats/zipball/master">https://github.com/marianoguerra/sistats/zipball/master</a>
+</li>
+</ul><h2>license?</h2>
 
 <p>LGPL v3 + optional beer for the author</p>
       </section>
