@@ -43,7 +43,7 @@ class Checker(transport.Checker):
     '''checker class that sends the stats to a mqtt broker'''
 
     def __init__(self, client_id, username, password, login_ep, data_ep,
-            topic_template="/ef/machine/%s/stats/%s", verbose=False):
+            topic_template="machine.%s.stats.%s", verbose=False):
         transport.Checker.__init__(self)
 
         self.data_ep = data_ep
@@ -79,7 +79,7 @@ class Checker(transport.Checker):
 
     def send_delta_stats(self, name, data):
         '''send delta stats somewhere'''
-        topic = self.topic_template % (self.client_id, name) + "/diff"
+        topic = self.topic_template % (self.client_id, name) + ".diff"
         self.send(topic, data)
 
     def send(self, topic, data):
