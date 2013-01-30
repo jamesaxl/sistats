@@ -43,15 +43,13 @@ class Checker(transport.Checker):
     '''checker class that sends the stats to a mqtt broker'''
 
     def __init__(self, client_id, username, password, login_ep, data_ep,
-            topic_template="/ef/machine/%s/stats/%s",
-            session_header_name="x-session-key", verbose=False):
+            topic_template="/ef/machine/%s/stats/%s", verbose=False):
         transport.Checker.__init__(self)
 
         self.data_ep = data_ep
         self.login_ep = login_ep
 
         self.session_key = None
-        self.session_header_name = session_header_name
 
         self.username = username
         self.password = password
@@ -71,8 +69,7 @@ class Checker(transport.Checker):
     def login(self):
         '''login to the service and get the session key'''
         self.log("logging in to", str(self.login_ep), "with", self.username)
-        self.session_key = login(self.login_ep, self.username, self.password,
-                self.session_header_name)
+        self.cookies = login(self.login_ep, self.username, self.password)
         self.log("logged in with", self.session_key)
 
     def send_stats(self, name, data):
@@ -93,25 +90,25 @@ class Checker(transport.Checker):
         json_data = json.dumps(event.to_json())
 
         headers = {
-            'content-type': 'application/json',
-            self.session_header_name: self.session_key
+            'content-type': 'application/json'
         }
 
-        response = requests.post(str(self.data_ep), json_data, headers=headers)
+        response = requests.post(str(self.data_ep), json_data, headers=headers,
+                cookies=self.cookies)
 
         self.log("response", response.status_code)
         if response.status_code in (401, 403):
             self.login()
 
-def login(endpoint, username, password, header_name):
-    '''do a login to endpoint, get the session key from header_name'''
-    session = dict(username=username, password=password, email=None)
+def login(endpoint, username, password):
+    '''do a login to endpoint'''
+    session = dict(username=username, password=password)
     data = json.dumps(session)
     headers = {'content-type': 'application/json'}
 
     response = requests.post(str(endpoint), data, headers=headers)
 
-    return response.headers.get(header_name)
+    return response.cookies
 
 def base_option_parser():
     '''create a parser for the basic options and return it, used to extend
