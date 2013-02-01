@@ -74,8 +74,8 @@ class Checker(transport.Checker):
     '''checker class that sends the stats to a mqtt broker'''
 
     def __init__(self, client_id, username, password, login_ep, data_ep,
-            topic_template="machine.%s.stats.%s", verbose=False):
-        transport.Checker.__init__(self)
+            topic_template="sistats.%s.%s", verbose=False, blacklist=None):
+        transport.Checker.__init__(self, blacklist)
 
         self.data_ep = data_ep
         self.login_ep = login_ep
@@ -184,6 +184,9 @@ def base_option_parser():
             default=10, type="int",
             help="check for new values every SEC seconds", metavar="SEC")
 
+    parser.add_option("-b", "--blacklist", dest="blacklist", default="",
+        help="don't generates events for the given types", metavar="TYPES")
+
     return parser
 
 class EndPoint(object):
@@ -208,7 +211,7 @@ def main():
     data_ep = EndPoint(opts.host, opts.port, opts.endpoint)
 
     checker = Checker(opts.clientid, opts.username, opts.password, login_ep,
-            data_ep, verbose=opts.verbose)
+            data_ep, verbose=opts.verbose, blacklist=opts.blacklist.split(","))
 
     transport.main_loop(checker, opts.checkinterval)
 

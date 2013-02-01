@@ -8,15 +8,19 @@ import sistats
 class Checker(object):
     '''base class to check for stats'''
 
-    def __init__(self):
+    def __init__(self, blacklist=None):
         self.last_vals = {}
         self.last_time = 0.0
         self.check_time = 0.0
+        self.blacklist = set(blacklist if blacklist is not None else [])
 
     def check_stats(self, name, function, delta_calculator=None):
         '''check stats for *name* using *function* if it's not the
         first time and *delta_calculator* is not None, calculate delta
         too'''
+
+        if name in self.blacklist:
+            return
 
         try:
             data = function()
