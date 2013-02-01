@@ -1,12 +1,43 @@
 '''REST transport for stats'''
 import time
 import json
+import Queue
 import pprint
 import requests
+import threading
 
 import transport
 
 from optparse import OptionParser
+
+class ThreadDoer(threading.Thread):
+    QUIT_MSG = object()
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self._in = Queue.Queue()
+
+    def call(self, fun, *args, **kwargs):
+        self._in.put((fun, args, kwargs))
+
+    def quit(self):
+        self._in.put(ThreadDoer.QUIT_MSG)
+
+    def run(self):
+        while True:
+            msg = self._in.get()
+
+            if msg is ThreadDoer.QUIT_MSG:
+                break
+
+            fun, args, kwargs = msg
+
+            try:
+                fun(*args, **kwargs)
+            except Exception as error:
+                print "error calling", fun, args, kwargs, error
+
+        print "exiting doer"
 
 class Event(object):
     '''a class that holds message metadata and payload'''
@@ -59,6 +90,8 @@ class Checker(transport.Checker):
 
         self.verbose = verbose
 
+        self.doer = ThreadDoer()
+        self.doer.start()
         self.login()
 
     def log(self, *args):
@@ -82,8 +115,7 @@ class Checker(transport.Checker):
         topic = self.topic_template % (self.client_id, name) + ".diff"
         self.send(topic, data)
 
-    def send(self, topic, data):
-        '''send event to the data endpoint'''
+    def _send(self, topic, data):
         event = Event(data, topic, self.client_id, self.username)
         self.log("send to", str(self.data_ep))
         self.log(event)
@@ -99,6 +131,13 @@ class Checker(transport.Checker):
         self.log("response", response.status_code)
         if response.status_code in (401, 403):
             self.login()
+
+    def send(self, topic, data):
+        '''send event to the data endpoint'''
+        self.doer.call(self._send, topic, data)
+
+    def on_exit(self):
+        self.doer.quit()
 
 def login(endpoint, username, password):
     '''do a login to endpoint'''
