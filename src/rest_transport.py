@@ -42,28 +42,14 @@ class ThreadDoer(threading.Thread):
 class Event(object):
     '''a class that holds message metadata and payload'''
 
-    def __init__(self, value, type_, item, username, timestamp=None, lat=0.0,
-            lng=0.0):
+    def __init__(self, value, channel):
 
-        self.lat = lat
-        self.lng = lng
         self.value = value
-        self.timestamp = timestamp
-
-        if timestamp is None:
-            self.timestamp = time.time()
-
-        self.eventType = type_
-        self.item = item
-        self.username = username
+        self.channel = channel
 
     def to_json(self):
         '''return a dict representation'''
         dct = vars(self).copy()
-
-        if self.timestamp:
-            dct["timestamp"] = int(self.timestamp * 1000)
-
         return dct
 
     def __str__(self):
@@ -116,7 +102,7 @@ class Checker(transport.Checker):
         self.send(topic, data)
 
     def _send(self, topic, data):
-        event = Event(data, topic, self.client_id, self.username)
+        event = Event(data, topic)
         self.log("send to", str(self.data_ep))
         self.log(event)
         json_data = json.dumps(event.to_json())
